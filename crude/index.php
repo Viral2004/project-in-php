@@ -3,7 +3,7 @@
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbName = "todoapp";
+$dbName = "idiscuss";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbName);
@@ -14,7 +14,7 @@ if (!$conn) {
 
 if(isset($_GET['delete'])){
     $sno = $_GET['delete'];
-    $sql = "DELETE FROM `todo` WHERE `todo`.`srno` = $sno";
+    $sql = "DELETE FROM `catagory` WHERE `catagory`.`category_id` = $sno";
     $result = mysqli_query($conn,$sql);
     if($result){
         echo "<script>alert('Your data has been removed')</script>";
@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
 
         if (!empty($srno) && !empty($title) && !empty($description)) {
             // Prepare the SQL query
-            $sql = "UPDATE `todo` SET `title` = '$title', `description` = '$description' WHERE `todo`.`srno` = $srno";
+            $sql = "UPDATE `catagory` SET `category_name` = '$title', `category_description` = '$description' WHERE `catagory`.`category_id` = $srno";
             $result = $conn->query($sql);
 
             if ($result) {
@@ -41,20 +41,23 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
              
         } 
     } else {
-        echo "st is empty";
-
+ 
         if ($_POST['title'] && $_POST['description']) {
-            $title = $_POST['title'];
-            $description = $_POST['description'];
-
-            $sql = "INSERT INTO `todo` (`title`, `description`) VALUES ('$title','$description')";
+            $title = mysqli_real_escape_string($conn, $_POST['title']);
+            $description = mysqli_real_escape_string($conn, $_POST['description']);
+            
+            $sql = "INSERT INTO `catagory` (`category_name`, `category_description`) VALUES ('$title', '$description')";
+            
             $result = mysqli_query($conn, $sql);
             if ($result) {
-                echo "<script>alert('Data inserted successfully')</script>";
+                echo "<script>alert('Data inserted successfully');</script>";
                 header("Location: " . $_SERVER['PHP_SELF']);
                 exit();
+            } else {
+                echo "Error inserting record: " . $conn->error;
             }
         }
+        
     }
 }
 
@@ -211,7 +214,7 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
                     <?php
 
 
-                    $sql = "SELECT * FROM todo";
+                    $sql = "SELECT * FROM catagory";
                     $result = mysqli_query($conn, $sql);
                     $srNO = 1;
                     $num = mysqli_num_rows($result);
@@ -226,19 +229,19 @@ if ($_SERVER["REQUEST_METHOD"] == 'POST') {
                             " . $srNO . "
                         </td>
                         <td scope='row' class='px-6 py-4 font-medium text-gray-900 whitespace-nowrap light:text-white'>
-                           " . $row['title'] . "
+                           " . $row['category_name'] . "
                         </td>
                         <td class='px-6 py-4'>
-                            " . $row['description'] . "
+                            " . $row['category_description'] . "
                         </td>
                         <td class='px-6 py-4 text-center'> <!-- Added text-center to center the buttons -->
                             <div class='flex justify-center gap-3'>
                                 <!-- Added gap-3 for better spacing between buttons -->
-                                <button type='button' id=" . $row['srno'] . " 
+                                <button type='button' id=" . $row['category_id'] . " 
                                     class=' edit text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800'>
                                     <i class='fas fa-edit me-1'></i> Edit
                                 </button>
-                                <button type='button' id=d" . $row['srno'] . " 
+                                <button type='button' id=d" . $row['category_id'] . " 
                                     class='delet text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800'>
                                     <i class='fas fa-trash me-1'></i> Delete
                                 </button>
